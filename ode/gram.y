@@ -169,7 +169,7 @@ stat            : SEP
 			  lfree($1);
 			  lfree($5);
                         }
-		// agre: Function definition
+		// XODE: Function definition
                 | IDENT '(' formalargs ')' '=' expr SEP
                         {
 			  struct sym *sp;
@@ -279,7 +279,7 @@ stat            : SEP
                         }
 		| SYMTAB SEP
 			{
-			  // agre: For debugging
+			  // XODE: For debugging
 			  struct sym* sp;
 			  printf("addr\t\tname\tvalue\t\tflags\n");
 			  for(sp = symtab; sp; sp=sp->sy_link)
@@ -289,7 +289,7 @@ stat            : SEP
 			}
                 ;
 
-// agre: formal argument list item
+// XODE: formal argument list item
 fargsitem	: IDENT
 	  	{
 			  struct sym *sp;
@@ -343,7 +343,7 @@ prtitem         : IDENT prttag
 			  lfree($1);
 			  $$ = pp;
                         }
-		// agre: this allows to print expressions as well as symbols.
+		// XODE: this allows to print expressions as well as symbols.
 		//	Allocate new symbol and associate
 		//	an expression to print with it.
 		 | expr
@@ -955,7 +955,7 @@ expr            : '(' expr ')'
 			  $$->ex_sym = lookup($1->lx_u.lxu_name);
 			  lfree($1);
                         }
-		// agre: Function call
+		// XODE: Function call
                 | IDENT '(' fargs ')'
                         {
 			  struct sym *sp;

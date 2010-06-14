@@ -2102,7 +2102,7 @@ yyreduce:
 /* Line 1455 of yacc.c  */
 #line 281 "gram.y"
     {
-			  // agre: For debugging
+			  // XODE: For debugging
 			  struct sym* sp;
 			  printf("addr\t\tname\tvalue\t\tflags\n");
 			  for(sp = symtab; sp; sp=sp->sy_link)

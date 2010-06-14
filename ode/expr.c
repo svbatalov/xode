@@ -50,7 +50,7 @@ eval (const struct expr *ep)
 	  *--sp = ep->ex_value;
 	  break;
 	case O_IDENT:
-	  // agre
+	  // XODE
 	  if (nesting == 0)
 	 	  *--sp = ep->ex_sym->sy_value; // work if replace_bound_vars() used
 	  else	// inside a function
@@ -193,7 +193,7 @@ eval (const struct expr *ep)
 	  tmp = *sp++;
 	  *sp = ibeta(*sp, tmp, tmp2);
 	  break;
-	// agre
+	// XODE
 	case O_STARTFUN:
 	  // save symtab
 	  callstack = push(callstack, (void*) symtab);

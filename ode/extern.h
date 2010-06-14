@@ -28,7 +28,7 @@ extern struct expr    exprzero, exprone;
 extern bool        sawstep, sawprint, sawevery, sawfrom;
 extern bool        tflag, pflag, sflag, eflag, rflag, hflag, conflag;
 extern integration_type	algorithm;
-extern struct pstack  *callstack; // agre
+extern struct pstack  *callstack; // XODE
 
 /* variables defined but not initted in global.c */
 extern char    *filename;
@@ -47,7 +47,7 @@ extern int     curline;
 /*
  * external function declarations
  */
-// agre: stack functions
+// XODE: stack functions
 struct pstack * push(struct pstack *s, void* d);
 void * pop(struct pstack *s);
 void * top(struct pstack *s);
@@ -79,7 +79,7 @@ void rterrors (const char *fmt, const char *s);
 void rtsquawks (const char *fmt, const char *s);
 void setflt (void);
 void sfree (struct sym *sp);
-void sqfree (struct sym *sp);	// agre
+void sqfree (struct sym *sp);	// XODE
 void solve (void);
 void startstep (void);
 void title (void);

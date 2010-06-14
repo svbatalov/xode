@@ -209,7 +209,7 @@ printq (void)
 	  {
 	    switch (pp->pr_which) 
 	      {
-		// agre: evaluate expression to be printed
+		// XODE: evaluate expression to be printed
 	      case P_EXPR:
 		f = eval(pp->pr_sym->sy_expr);
 		break;

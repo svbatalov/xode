@@ -53,7 +53,7 @@ struct sym
 typedef enum 
 {
   P_VALUE, P_PRIME, P_SSERR, P_ACERR, P_ABERR
-  /* agre */
+  /* XODE */
   , P_EXPR
 } ent_cell;
 
@@ -93,7 +93,7 @@ typedef enum
   O_NEG, O_ABS, O_SINH, O_COSH, O_TANH, O_ASINH, O_ACOSH, O_ATANH, O_SQAR,
   O_CUBE, O_INV, O_FLOOR, O_CEIL, O_J0, O_J1, O_Y0, O_Y1, O_ERF, O_ERFC,
   O_INVERF, O_LGAMMA, O_GAMMA, O_NORM, O_INVNORM, O_IGAMMA, O_IBETA
-  // agre
+  // XODE
   ,O_CALL, O_STARTFUN, O_ENDFUN
 } op_type;
 
@@ -108,7 +108,7 @@ struct expr
   struct expr    *ex_next;
 };
 
-// agre: (void*) pointer stack
+// XODE: (void*) pointer stack
 struct pstack {
 	int size;
 	int maxsize;
