@@ -1,0 +1,8 @@
+This code is almost completely taken from plotutils-2.5:
+http://www.gnu.org/software/plotutils/. Major reasons to
+place the code into separate project are to reduce the size
+of the source and to be able to post it on github web repository
+under XODE name (and not xplotutils or the like).
+
+The ODE language lacks such features as functions and the ability
+to print expressions and not only symbols. XODE fixes that.

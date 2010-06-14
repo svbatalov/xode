@@ -1,0 +1,12 @@
+From plotutils-2.5/AUTHORS:
+
+	Rob Maier <rsm@math.arizona.edu> wrote the libplot/libplotter library and
+	the graphics programs graph, plot, tek2plot, and plotfont, beginning in
+	1995.  The old `GNU graphics' package (written by Rich Murphey
+	<rich@freebsd.org> in 1989-1991) served as a starting point, but the
+	plotutils package is at least an order of magnitude larger.  Probably none
+	of the code from the earlier package remains in libplot/libplotter or the
+	graphics programs.
+
+	ode was written by Nick Tufillaro <nbt@reed.edu> in 1978-1994, and has been
+	somewhat modified and extended so as to merge it into the package.
