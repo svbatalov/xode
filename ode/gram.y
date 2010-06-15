@@ -19,6 +19,10 @@
 #include "ode.h"
 #include "extern.h"
 
+
+// XODE
+void free_func(struct sym* sp);
+
 /*
  * Value is true iff operands pass ONECON.
  */
@@ -96,7 +100,7 @@ bool erritem;
 %token FLOOR CEIL J0 J1 Y0 Y1
 %token LGAMMA GAMMA ERF ERFC INVERF NORM INVNORM
 %token IGAMMA IBETA
-%token EVERY FROM PRINT STEP EXAM SYMTAB
+%token EVERY FROM PRINT STEP EXAM SYMTAB MACRO
 %start program
 %type <simple> prttag
 %type <lexptr> cexpr
@@ -177,11 +181,9 @@ stat            : SEP
 			  // delete previously defined function:
 			  //  1. free arglist, because it is not in symtab and will be lost otherwise.
 			  //  2. free function body.
-			  if(sp->sy_flags & SF_ISFUNC)
-				{
-					sqfree(sp->sy_expr->ex_sym);
-					efree(sp->sy_expr);
-				}
+			  if(sp->sy_flags & (SF_ISFUNC|SF_ISMACRO))
+				free_func(sp);
+
 			  struct expr *e1=ealloc(), *e2=ealloc();
 
 			  e1->ex_sym  = $3;
@@ -194,6 +196,25 @@ stat            : SEP
 			  
 			  sp->sy_flags = SF_ISFUNC;
 			  sp->sy_expr  = e1;
+
+			  lfree($1);
+			  lfree($7);
+			}
+		// XODE: Macro definition.
+                | IDENT '(' formalargs ')' MACRO expr SEP
+			{
+			  struct sym *sp;
+			  sp = lookup($1->lx_u.lxu_name);
+			  // delete previously defined function or macro:
+			  if(sp->sy_flags & (SF_ISFUNC|SF_ISMACRO))
+				free_func(sp);
+			  struct expr *ep=ealloc();
+
+			  ep->ex_sym  = $3;
+			  ep->ex_oper = O_NOOP;
+			  concat(ep, $6);
+			  sp->sy_flags = SF_ISMACRO;
+			  sp->sy_expr  = ep;
 
 			  lfree($1);
 			  lfree($7);
@@ -239,15 +260,24 @@ stat            : SEP
                         }
                 | EXAM IDENT SEP
                         {
-			  struct sym *sp;
+			  struct sym *sp, *sp2;
 			  lfree($3);
 			  sp = lookup($2->lx_u.lxu_name);
 			  lfree($2);
 			  printf ("\"%.*s\" is ",NAMMAX,sp->sy_name);
-			  switch (sp->sy_flags & (SF_DEPV|SF_ISFUNC))
+			  switch (sp->sy_flags & (SF_DEPV|SF_COMPOUND))
 			    {
 			    case SF_ISFUNC:
-			      printf ("a function\n");
+			      printf ("a function with arguments ( ");
+			      for(sp2 = sp->sy_expr->ex_sym; sp2; sp2=sp2->sy_link)
+				printf("%s ", sp2->sy_name);
+			      printf (")\n");
+			      break;
+			    case SF_ISMACRO:
+			      printf ("a macro with arguments ( ");
+			      for(sp2 = sp->sy_expr->ex_sym; sp2; sp2=sp2->sy_link)
+				printf("%s ", sp2->sy_name);
+			      printf (")\n");
 			      break;
 			    case SF_DEPV:
 			    case SF_ISEQN:
@@ -955,25 +985,59 @@ expr            : '(' expr ')'
 			  $$->ex_sym = lookup($1->lx_u.lxu_name);
 			  lfree($1);
                         }
-		// XODE: Function call
                 | IDENT '(' fargs ')'
                         {
-			  struct sym *sp;
-			  struct expr *call;
+			  struct sym *sp, *sp2;
+			  struct expr *e1, *e2, *e3, *e4, *prev, *call;
 			  sp = lookup($1->lx_u.lxu_name);
-			  call = ealloc();
-			  call->ex_oper = O_CALL; 
-			  call->ex_sym  = sp;
-			  if ($3 != NULL )
-				concat($$=$3, call);
-			  else $$ = call;
+
+			if(sp->sy_flags & SF_ISMACRO)
+			  {
+			// XODE: Macro call
+			// Macro have to be defined already.
+			// Copy the body of macro substituting given args
+			   e2 = ecopy(sp->sy_expr->ex_next); // copy macro body
+			   prev = NULL;
+			   for(e1=e2; e1; e1=e1->ex_next) // scan macro body
+				{
+				  if(e1->ex_oper==O_IDENT)
+				    for(sp2=sp->sy_expr->ex_sym, e3=$3;	// scan macro arglist and fargs simultaneously
+					sp2;
+					sp2=sp2->sy_link, e3=e3->ex_next)
+					// if IDENT occurs in arglist
+					if(strncmp(sp2->sy_name, e1->ex_sym->sy_name, NAMMAX)==0)
+					{
+					  e4 = e1->ex_next;
+					  free((void*)e1);
+					  e1 = ecopy(e3);
+					  concat(e1, e4);
+					  if(prev) prev->ex_next = e1;
+					  else e2 = e1;
+					}
+					prev = e1;
+				}
+				efree($3);
+				$$ = e2;
+			  }
+			  else
+			// XODE: Function call.
+			// Function may be undefined yet.
+			  {
+			    call = ealloc();
+			    call->ex_oper = O_CALL; 
+			    call->ex_sym  = sp;
+			    if ($3 != NULL )
+		  		concat($$=$3, call);
+			    else $$ = call;
+			  }
 			  lfree($1);
                         }
                 ;
 
 fargs	:	/* empty */ { $$=NULL; }
-	| expr	{ $$ = $1; }
+	| expr { $$ = $1; }
 	| fargs ',' expr { $$ = $3; concat($$, $1); }	// args saved in reverse
+;
 %%
 
 int
@@ -1092,4 +1156,11 @@ prexq (const struct expr *ep)
       if (s != NULL)
 	printf ("\t%s\n",s);
     }
+}
+
+// XODE: delete function definition
+void free_func(struct sym* sp)
+{
+	sqfree(sp->sy_expr->ex_sym);
+	efree(sp->sy_expr);
 }

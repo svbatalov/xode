@@ -78,6 +78,7 @@ invnorm		{ return INVNORM; }
 ibeta		{ return IBETA; }
 igamma		{ return IGAMMA; }
 symtab		{ return SYMTAB; }
+":="		{ return MACRO; }
 [_a-zA-Z][_a-zA-Z0-9]*		{
 			yylval.lexptr = lalloc();
 			strncpy(yylval.lexptr->lx_u.lxu_name,yytext,NAMMAX);

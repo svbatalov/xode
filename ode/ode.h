@@ -40,11 +40,13 @@ struct sym
  * bits in the flags word
  * of a symbol table entry
  */
-#define SF_INIT 1		/* set when the initial value is given */
-#define SF_ISEQN 2		/* set when an ODE is given */
-#define SF_DEPV (SF_INIT|SF_ISEQN)
-#define SF_ISFARG 4		/* set if it is a formal argument */
-#define SF_ISFUNC 8
+#define SF_INIT		1		/* set when the initial value is given */
+#define SF_ISEQN	2		/* set when an ODE is given */
+#define SF_DEPV	(SF_INIT|SF_ISEQN)
+#define SF_ISFARG	4		/* set if it is a formal argument */
+#define SF_ISFUNC	8
+#define SF_ISMACRO	16
+#define SF_COMPOUND	(SF_ISFUNC|SF_ISMACRO)
 
 /* 
  * enumeration of printable cells in 

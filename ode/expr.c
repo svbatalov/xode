@@ -280,6 +280,19 @@ efree (struct expr *ep)
 	  free ((void *)ep);
 }
 
+// XODE: recursively make a copy of expression list
+struct expr*
+ecopy (struct expr *ep)
+{
+  if (ep == NULL || ep == &exprzero || ep == &exprone )
+    return ep;
+  struct expr *e = ealloc();
+  memcpy((void *)e, (void *)ep, sizeof(struct expr));
+  e->ex_next = ecopy(ep->ex_next);
+  return e;
+}
+
+
 /*
  * Replace symbols in `ep' by symbols with the same name found in symtab.
  */

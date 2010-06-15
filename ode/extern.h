@@ -63,6 +63,7 @@ void args (int ac, char **av);
 void defalt (void);
 void eu (void);
 void efree (struct expr *ep);
+struct expr* ecopy (struct expr *ep); //XODE
 void field (void);
 void maxerr (void);
 void panic (const char *s);
