@@ -51,6 +51,7 @@ extern int     curline;
 struct pstack * push(struct pstack *s, void* d);
 void * pop(struct pstack *s);
 void * top(struct pstack *s);
+void free_pstack(struct pstack *s);
 
 bool check (void);
 bool hierror (void);

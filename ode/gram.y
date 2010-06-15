@@ -90,6 +90,7 @@ bool erritem;
         struct  lex     *lexptr;
         struct  sym     *symptr;
         struct  expr    *exprptr;
+	struct	pstack	*argptr;
         struct  prt     *prtptr;
         int     simple;
 }
@@ -107,7 +108,7 @@ bool erritem;
 %type <exprptr> expr
 %type <prtptr> prtitem
 %type <symptr> formalargs fargsitem
-%type <exprptr> fargs
+%type <argptr> fargs
 %nonassoc '='
 %left '+' '-'
 %left '*' '/'
@@ -988,7 +989,7 @@ expr            : '(' expr ')'
                 | IDENT '(' fargs ')'
                         {
 			  struct sym *sp, *sp2;
-			  struct expr *e1, *e2, *e3, *e4, *prev, *call;
+			  struct expr *e1, *e2, *e3, *prev, *call;
 			  sp = lookup($1->lx_u.lxu_name);
 
 			if(sp->sy_flags & SF_ISMACRO)
@@ -998,25 +999,28 @@ expr            : '(' expr ')'
 			// Copy the body of macro substituting given args
 			   e2 = ecopy(sp->sy_expr->ex_next); // copy macro body
 			   prev = NULL;
+			   int i;
 			   for(e1=e2; e1; e1=e1->ex_next) // scan macro body
 				{
 				  if(e1->ex_oper==O_IDENT)
-				    for(sp2=sp->sy_expr->ex_sym, e3=$3;	// scan macro arglist and fargs simultaneously
+				    for(sp2=sp->sy_expr->ex_sym, i=0;	// scan macro arglist and fargs simultaneously
 					sp2;
-					sp2=sp2->sy_link, e3=e3->ex_next)
+					sp2=sp2->sy_link, i++)
 					// if IDENT occurs in arglist
 					if(strncmp(sp2->sy_name, e1->ex_sym->sy_name, NAMMAX)==0)
 					{
-					  e4 = e1->ex_next;
+					  e3 = e1->ex_next;
 					  free((void*)e1);
-					  e1 = ecopy(e3);
-					  concat(e1, e4);
+					  e1 = ecopy($3->items[i]);
+					  concat(e1, e3);
 					  if(prev) prev->ex_next = e1;
 					  else e2 = e1;
 					}
 					prev = e1;
 				}
-				efree($3);
+				for(i=0; i<$3->size; i++)
+					efree($3->items[i]);
+				free_pstack($3);
 				$$ = e2;
 			  }
 			  else
@@ -1026,17 +1030,30 @@ expr            : '(' expr ')'
 			    call = ealloc();
 			    call->ex_oper = O_CALL; 
 			    call->ex_sym  = sp;
-			    if ($3 != NULL )
-		  		concat($$=$3, call);
+			    int i;
+			    if ($3 != NULL ){
+				// concatenate in reverse order
+				for(i = $3->size-1; i>0; i--)
+					concat($3->items[i], $3->items[i-1]);
+				concat($3->items[i], call);
+				$$ = top($3);
+			    }
 			    else $$ = call;
+			    free_pstack($3);
 			  }
 			  lfree($1);
                         }
                 ;
 
-fargs	:	/* empty */ { $$=NULL; }
-	| expr { $$ = $1; }
-	| fargs ',' expr { $$ = $3; concat($$, $1); }	// args saved in reverse
+fargs	: /* empty */ { $$=NULL; }
+	| expr
+	{
+	  $$ = push(NULL, (void*)$1);
+	}
+	| fargs ',' expr
+	{
+		$$ = push((void*)$1, (void*)$3);
+	}
 ;
 %%
 

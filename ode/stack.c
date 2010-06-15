@@ -1,5 +1,6 @@
 #include "libcommon.h"
 #include "ode.h"
+#include "extern.h"
 #define STACKSIZE 30
 
 void resize( struct pstack *s)
@@ -28,10 +29,19 @@ void * pop(struct pstack *s)
 {
 	if(s->size == 0) panic("pstack underflow");
 	else return s->items[--s->size];
+	return NULL; // to calm down the compiler
 }
 
 void * top(struct pstack *s)
 {
 	if(s->size == 0) return NULL;
 	else return s->items[s->size-1];
+}
+
+void free_pstack(struct pstack* s)
+{
+	if(s){
+		if(s->items) free(s->items);
+		free(s);
+	}
 }

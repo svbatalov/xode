@@ -32,7 +32,7 @@ eval (const struct expr *ep)
  	  .ex_sym   = NULL,
  	  .ex_next  = NULL },
 	*ep2 = &e2; // aux. expr used for jumps: ep2->ex_next = <jump target>
-  struct sym  *s, *s2, *s3, *arg;
+  struct sym  *s, *s2, *s3;
   for (sp = &stack[NSTACK]; ep != NULL; ep = ep->ex_next) 
     {
 	//FIXME
