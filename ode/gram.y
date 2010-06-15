@@ -1012,9 +1012,10 @@ expr            : '(' expr ')'
 					  e3 = e1->ex_next;
 					  free((void*)e1);
 					  e1 = ecopy($3->items[i]);
-					  concat(e1, e3);
+					  if(e3) concat(e1, e3);
 					  if(prev) prev->ex_next = e1;
 					  else e2 = e1;
+					  break;
 					}
 					prev = e1;
 				}
