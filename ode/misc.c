@@ -52,7 +52,7 @@ check (void)
   ivp = prevp = NULL;
   for (sp = symtab; sp != NULL; sp = sp->sy_link) 
     {
-      if (!(sp->sy_flags & (SF_DEPV|SF_ISFUNC))) 
+      if (!(sp->sy_flags & (SF_DEPV|SF_COMPOUND))) 
 	{
 	  if (ivp != NULL) 
 	    {
