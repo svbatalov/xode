@@ -106,3 +106,26 @@ operand stack used for evaluating derivatives is 30 cells.  This limit
 could conceivably be exceeded for a very complex differential equation.
 The solution is to simplify the equation if possible, and where not, to
 recompile ode with a larger operand stack.
+
+5. XODE extensions.
+
+Modifications to the grammar:
+stat ::= ...
+	| IDENT '(' formalargs ')' '=' expr SEP		// Function definition.
+	| IDENT '(' formalargs ')' MACRO expr SEP	// Macro definition. MACRO = ':='
+	| SYMTAB SEP					// Print symtab for debugging.
+;
+
+formalargs ::= /* empty */ | IDENT | formalargs ',' IDENT 
+;
+
+prtitem ::= ...
+	| expr	// We'd like to be able to print expressions
+;
+
+expr ::= ...
+	| IDENT '(' fargs ')'	// Function and macro call
+;
+
+fargs	: /* empty */ | expr | fargs ',' expr
+;
